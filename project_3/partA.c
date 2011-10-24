@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
-#define THREAD_COUNT 16
-#define M 1000
-#define N 800
+#define THREAD_COUNT 2
+#define M 3
+#define N 4
 #define K 0
 
 void *Function(void *);
@@ -16,7 +16,7 @@ pthread_mutex_t my_mutex;               /* MUTEX data structure for locking */
 
 int matrix[M][N];
 int vvector[N]; //double-v to prevent name-clash
-int result_vector[N];
+int result_vector[M];
 
 
 int main()
@@ -82,7 +82,7 @@ int main()
 /*      {*/
 /*        printf("[");*/
 /*      }*/
-/*      printf(" %d ", array[i][j]);*/
+/*      printf(" %d ", matrix[i][j]);*/
 /*      if (j == (N-1))*/
 /*      {*/
 /*        printf("]\n");*/
@@ -99,8 +99,8 @@ int main()
 /*    {*/
 /*      printf("[");*/
 /*    }*/
-/*    printf(" %d ", array[i]);*/
-/*    if (i == (M-1))*/
+/*    printf(" %d ", vvector[i]);*/
+/*    if (i == (N-1))*/
 /*    {*/
 /*      printf("]\n");*/
 /*    }*/
@@ -108,14 +108,14 @@ int main()
 
 /*  printf("\n\nResult:\n");*/
 
-/*  print out the N-by-1 result vector*/
-/*  for (i=0; i<N; i++)*/
+/*  print out the M-by-1 result vector*/
+/*  for (i=0; i<M; i++)*/
 /*  {*/
 /*    if (i == 0)*/
 /*    {*/
 /*      printf("[");*/
 /*    }*/
-/*    printf(" %d ", array[i]);*/
+/*    printf(" %d ", result_vector[i]);*/
 /*    if (i == (M-1))*/
 /*    {*/
 /*      printf("]\n");*/
@@ -136,7 +136,7 @@ void *Function(void *parm)
   matvec_DOTPRODUCT(matrix, vvector, result_vector);
 }
 
-int matvec_DOTPRODUCT(int matrix[M][N], int vvector[N], int result[N])
+int matvec_DOTPRODUCT(int matrix[M][N], int vvector[N], int result[M])
 {
   int i, j; 
 
@@ -150,7 +150,7 @@ int matvec_DOTPRODUCT(int matrix[M][N], int vvector[N], int result[N])
   return 0;
 }
 
-int matvec_SAXPY(int matrix[M][N], int vvector[N], int result[N])
+int matvec_SAXPY(int matrix[M][N], int vvector[N], int result[M])
 {
   int i, j; 
 
