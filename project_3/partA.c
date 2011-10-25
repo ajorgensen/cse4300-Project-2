@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
-#define THREAD_COUNT 2
-#define M 4
-#define N 4
+#define THREAD_COUNT 16
+#define M 1000
+#define N 800
 #define K 0
 
 void *Function(void *);
@@ -140,7 +140,7 @@ void *Function(void *parm)
 /* declare a sub-matrix of the original for each thread containing N/THREAD_COUNT columns*/
   int split_matrix[M][N/THREAD_COUNT];
   
-  printf("Function me=%d: self=%d", me, self);
+  printf("Function me=%d: self=%d\n", me, self);
   
 /* populate the sub-matrix with values of the appropriate columns*/
   for (i=0; i<M; i++)
@@ -153,7 +153,7 @@ void *Function(void *parm)
 /* call the subroutine (DOTPRODUCT or SAXPY) to aggregate results from each thread*/
   matvec_DOTPRODUCT(me, split_matrix, vvector, result_vector);
 
-  printf("Function me=%d: done with parm=%d", me, self);
+  printf("Function me=%d: done with parm=%d\n", me, self);
 }
 
 int matvec_DOTPRODUCT(int thread_id, int matrix[M][N/THREAD_COUNT], int vvector[N], int result[M])
@@ -178,7 +178,7 @@ int matvec_SAXPY(int thread_id, int matrix[M][N/THREAD_COUNT], int vvector[N], i
     for (i=0; i<M; i++)
     {
       pthread_mutex_lock(&my_mutex);
-      result[i] = result[i] + matrix[i][j] * vvector[j];
+      result[i] = result[i] + matrix[i][j] * vvector[j+(thread_id*THREAD_COUNT)];
       pthread_mutex_unlock(&my_mutex);
     }
   return 0;
