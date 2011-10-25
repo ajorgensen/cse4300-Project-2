@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/types.h>
 #define THREAD_COUNT 2
-#define M 3
+#define M 4
 #define N 4
 #define K 0
 
@@ -17,7 +17,6 @@ pthread_mutex_t my_mutex;               /* MUTEX data structure for locking */
 int matrix[M][N];
 int vvector[N]; //double-v to prevent name-clash
 int result_vector[M];
-
 
 int main()
 {
@@ -132,29 +131,50 @@ int main()
 /* start routine for the threads */
 void *Function(void *parm)
 {
-/*  call the subroutine to perform matrix multiplication*/
-  matvec_DOTPRODUCT(matrix, vvector, result_vector);
+  int me, self;
+
+  me = (int) parm;                /* me = my own assigned thread ordinal */
+  self = (int) pthread_self();    /* self = the Thread Library thread number */
+  int i, j;
+  
+/* declare a sub-matrix of the original for each thread containing N/THREAD_COUNT columns*/
+  int split_matrix[M][N/THREAD_COUNT];
+  
+  printf("Function me=%d: self=%d", me, self);
+  
+/* populate the sub-matrix with values of the appropriate columns*/
+  for (i=0; i<M; i++)
+  {
+    for (j=0; j<(N/THREAD_COUNT); j++)
+    {
+      split_matrix[i][j] = matrix[i][j+(me*THREAD_COUNT)];
+    }
+  }
+/* call the subroutine (DOTPRODUCT or SAXPY) to aggregate results from each thread*/
+  matvec_DOTPRODUCT(me, split_matrix, vvector, result_vector);
+
+  printf("Function me=%d: done with parm=%d", me, self);
 }
 
-int matvec_DOTPRODUCT(int matrix[M][N], int vvector[N], int result[M])
+int matvec_DOTPRODUCT(int thread_id, int matrix[M][N/THREAD_COUNT], int vvector[N], int result[M])
 {
   int i, j; 
 
   for (i=0; i<M; i++)
-    for (j=0; j<N; j++)
+    for (j=0; j<(N/THREAD_COUNT); j++)
     {
       pthread_mutex_lock(&my_mutex);
-      result[i] = result[i] + matrix[i][j] * vvector[j];
+      result[i] = result[i] + matrix[i][j] * vvector[j+(thread_id*THREAD_COUNT)];
       pthread_mutex_unlock(&my_mutex);
     }
   return 0;
 }
 
-int matvec_SAXPY(int matrix[M][N], int vvector[N], int result[M])
+int matvec_SAXPY(int thread_id, int matrix[M][N/THREAD_COUNT], int vvector[N], int result[M])
 {
   int i, j; 
 
-  for (j=0; j<N; j++)
+  for (j=0; j<(N/THREAD_COUNT); j++)
     for (i=0; i<M; i++)
     {
       pthread_mutex_lock(&my_mutex);
