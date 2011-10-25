@@ -38,7 +38,7 @@ int main()
     }
   }
   
-/*  generate values for the N-by-1 vector and initialize the result vector to <0,0,...,0>*/
+/*  generate values for the N-by-K matrix*/
   for (i=0; i<N; i++)
   {
     for (j=0; j<K; j++)
@@ -50,7 +50,7 @@ int main()
 /*  initialize all values of the result_matrix to 0's*/
   for (i=0; i<M; i++)
   {
-    for (j=0; j<N; j++)
+    for (j=0; j<K; j++)
     {
       result_matrix[i][j] = 0;
     }

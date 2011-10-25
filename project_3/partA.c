@@ -38,10 +38,15 @@ int main()
     }
   }
   
-/*  generate values for the N-by-1 vector and initialize the result vector to <0,0,...,0>*/
+/*  generate values for the N-by-1 vector*/
   for (i=0; i<N; i++)
   {
     vvector[i] = gen_rand();
+  }
+  
+/*  initialize result_vector to all 0's*/
+  for (i=0; i<M; i++)
+  {
     result_vector[i] = 0;
   }
   
